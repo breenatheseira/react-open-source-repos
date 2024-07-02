@@ -4,12 +4,12 @@ import {
   createAsyncThunk,
 } from '@reduxjs/toolkit'
 
-import { sampleData } from '../../result-sample'
-import getAllRepos from '../../utils/githubApi';
+import fetchInitialRepos from '../../utils/githubApi';
 
 const repositoriesAdapter = createEntityAdapter()
 
 const initialState = repositoriesAdapter.getInitialState({
+  currentPage: 0,
   status: 'idle',
   error: null
 })
@@ -24,8 +24,14 @@ const repositoriesSlice = createSlice({
         state.status = 'loading'
       })
       .addCase(fetchRepositories.fulfilled, (state, action) => {
+        const loadedRepos = action.payload.data
+        if(loadedRepos.length === 0){
+          state.status = 'fully_loaded'
+          return
+        }
         state.status = 'succeeded'
-        repositoriesAdapter.upsertMany(state, action.payload)
+        repositoriesAdapter.upsertMany(state, loadedRepos)
+        state.currentPage = action.payload.page
       })
       .addCase(fetchRepositories.rejected, (state, action) => {
         state.status = 'failed'
@@ -41,15 +47,13 @@ export const {
   selectIds: selectRepositoryIds,
 } = repositoriesAdapter.getSelectors(state => state.repositories)
 
-export const fetchRepositories = createAsyncThunk('repositories/fetchRepositories', async () => {
-  // works, don't use the rates unnecessarily
-    // getAllRepos(page).then( response => {
-    //   setRepos(response.data);
-    // });
-  const response = await getAllRepos(1)
-  return response.data
-  // return sampleData
+export const fetchRepositories = createAsyncThunk('repositories/fetchRepositories', async (dispatch, { getState }) => {
+  const status = getState().repositories.status
+  if(status === 'fully_loaded'){
+    return
+  }
+  const page = getState().repositories.currentPage + 1
+  console.log('fetching repos, page: ' + page)
+  const response = await fetchInitialRepos(page)
+  return { data: response.data, page }
 })
-
-
-

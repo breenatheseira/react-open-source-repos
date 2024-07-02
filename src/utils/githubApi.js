@@ -14,13 +14,17 @@ const options = {
   }
 }
 
-async function getAllRepos(pageNumber = 1){
+if(import.meta.env.VITE_GITHUB_BEARER_TOKEN){
+  options.headers['Authorization'] = 'Bearer ' + import.meta.env.VITE_GITHUB_BEARER_TOKEN
+}
+
+async function fetchInitialRepos(page){
   options.params = {
     sort: 'full_name',
-    page: pageNumber
+    page
   };
 
   return axios.get(allReactReposPath, options);
 }
 
-export default getAllRepos;
+export default fetchInitialRepos;

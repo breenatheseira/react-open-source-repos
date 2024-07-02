@@ -24,6 +24,9 @@ const ListRepositories = () => {
         <h1>React Community's <br/> Open Source Repo Directory</h1>
       </div>
       <div>
+        <span>Repositories Loaded: {' '}{repos.length}</span>
+      </div>
+      <div>
         <SearchBar 
           searchText={searchText}
           onSearchTextChange={setSearchText} />

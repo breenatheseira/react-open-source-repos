@@ -46,8 +46,9 @@ export const fetchRepositories = createAsyncThunk('repositories/fetchRepositorie
     // getAllRepos(page).then( response => {
     //   setRepos(response.data);
     // });
-  // const response = 
-  return sampleData
+  const response = await getAllRepos(1)
+  return response.data
+  // return sampleData
 })
 
 

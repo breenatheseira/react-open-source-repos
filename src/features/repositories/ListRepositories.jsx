@@ -1,16 +1,18 @@
-import SearchBar from '../../components/SearchBar';
-import Accordion from '../../components/Accordion';
-import { useEffect, useState } from 'react';
+import Accordion from 'react-bootstrap/Accordion';
+
+import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 
-import { fetchRepositories, selectAllRepositories } from './repositoriesSlice'
+import { fetchRepositories, selectAllRepositories, selectRepositoryIds } from './repositoriesSlice'
 
-const ListRepositories = () => {
-  const [searchText, setSearchText] = useState('');
+import RepositoryItem from './RepositoryItem';
+
+const ListRepositories = ({ searchText }) => {
   const dispatch = useDispatch()
 
   const isLoading = useSelector(state => state.repositories.status)
   const repos = useSelector(selectAllRepositories)
+  const repoIds = useSelector(selectRepositoryIds)
 
   useEffect(() => {
     if(isLoading === 'idle'){
@@ -18,25 +20,23 @@ const ListRepositories = () => {
     }
   }, [])
 
+  const results = [];
+  repos.forEach(repo => {
+    if(repo.name.includes(searchText)){
+      results.push(<RepositoryItem repo={repo} key={repo.id} />);
+    }
+    return;
+  });
+
   return (
-    <div>
-      <div>
-        <h1>React Community's <br/> Open Source Repo Directory</h1>
-      </div>
-      <div>
+    <>
+      <div className='pb-5 text-center'>
         <span>Repositories Loaded: {' '}{repos.length}</span>
       </div>
-      <div>
-        <SearchBar 
-          searchText={searchText}
-          onSearchTextChange={setSearchText} />
-      </div>
-      <div>
-        <Accordion
-          repos={repos}
-          searchText={searchText} />
-      </div>
-    </div>
+      <Accordion defaultActiveKey={repoIds[0]}>
+        {results}
+      </Accordion>
+    </>
   )
 }
 

@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from 'react-redux'
 
 import { 
   fetchRepositories, 
+  fetchRepository,
   selectAllRepositories, 
   selectRepositoryIds,
 } from './repositoriesSlice'
@@ -36,6 +37,16 @@ const ListRepositories = ({ searchText }) => {
     }
     if(repositoriesStatus === 'idle' || isVisible){
       dispatch(fetchRepositories())
+        .unwrap()
+        .then((response) => {
+          if(response.page === 1){
+            const id = response.data[0].id
+            dispatch(fetchRepository(id))
+          }
+        })
+        .catch(e => {
+          console.log(e.error_message)
+        })
     }
   }, [isVisible])
 
@@ -49,7 +60,6 @@ const ListRepositories = ({ searchText }) => {
   });
 
   let content
-
   switch(repositoriesStatus){
     case 'loading':
       content = <Loader text={'Loading...'}/>
@@ -62,6 +72,11 @@ const ListRepositories = ({ searchText }) => {
       break;
   }
 
+  function handleOnSelect(repoId){
+    if(repoId !== null)
+      dispatch(fetchRepository(repoId))
+  }
+
   return (
     <>
       <div className='pb-5 text-center'>
@@ -69,7 +84,10 @@ const ListRepositories = ({ searchText }) => {
       </div>
       {(repoIds.length === 0) ? (content) : (<></>)}
       {(repoIds.length > 0) ? (
-        <Accordion defaultActiveKey={repoIds && repoIds[0]}>
+        <Accordion 
+          defaultActiveKey={repoIds && repoIds[0]}
+          onSelect={(e) => {handleOnSelect(e)}}
+        >
           {results}
           {content}
           <div ref={containerRef}></div>

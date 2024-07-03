@@ -3,6 +3,8 @@ import axios from 'axios'
 // https://api.github.com/orgs/reactjs/repos?sort=full_name&page=1
 const allReactReposPath = '/orgs/reactjs/repos';
 
+const getRepoByIdPath = '/repos/'
+
 // https://api.github.com/search/repositories?page=1&q=t+in:name+org:reactjs
 const searchRepo = '/search/repositories';
 
@@ -18,7 +20,7 @@ if(import.meta.env.VITE_GITHUB_BEARER_TOKEN){
   options.headers['Authorization'] = 'Bearer ' + import.meta.env.VITE_GITHUB_BEARER_TOKEN
 }
 
-async function fetchInitialRepos(page){
+export async function fetchInitialRepos(page){
   options.params = {
     sort: 'full_name',
     page
@@ -27,4 +29,9 @@ async function fetchInitialRepos(page){
   return axios.get(allReactReposPath, options);
 }
 
-export default fetchInitialRepos;
+export async function fetchOneRepo(fullName){
+  const path = getRepoByIdPath + fullName
+  options.params = {}
+
+  return axios.get(path, options)
+}

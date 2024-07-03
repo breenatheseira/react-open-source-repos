@@ -4,7 +4,11 @@ import {
   createAsyncThunk,
 } from '@reduxjs/toolkit'
 
-import fetchInitialRepos from '../../utils/githubApi';
+import {
+  fetchInitialRepos,
+  fetchOneRepo,
+} from '../../utils/githubApi';
+
 import { repositorySerializer } from './repositorySerializer'
 
 const repositoriesAdapter = createEntityAdapter()
@@ -37,6 +41,16 @@ const repositoriesSlice = createSlice({
       .addCase(fetchRepositories.rejected, (state, action) => {
         state.status = 'failed'
         state.error = action.error.message
+        console.log(action.error)
+      })
+      .addCase(fetchRepository.fulfilled, (state, action) => {
+        const id = action.payload.id
+        state.entities[id] = action.payload
+      })
+      .addCase(fetchRepository.rejected, (state, action) => {
+        const id = action.meta.arg
+        state.entities[id].subscribers_status = 'failed'
+        console.log(action.error.message)
       })
   }
 })
@@ -46,6 +60,7 @@ export default repositoriesSlice.reducer
 export const {
   selectAll: selectAllRepositories,
   selectIds: selectRepositoryIds,
+  selectById: selectRepositoryById,
 } = repositoriesAdapter.getSelectors(state => state.repositories)
 
 export const fetchRepositories = createAsyncThunk('repositories/fetchRepositories', async (dispatch, { getState }) => {
@@ -63,3 +78,13 @@ export const fetchRepositories = createAsyncThunk('repositories/fetchRepositorie
 function formatManyRepositories(repositoriesArray){
   return repositoriesArray.map(repo => repositorySerializer(repo))
 }
+
+export const fetchRepository = createAsyncThunk('repositories/fetchRepository', async (id, { getState }) => {
+  const repo = getState().repositories.entities[id]
+
+  if(repo.subscribers_status === 'loaded'){
+    return repo
+  } 
+  const response = await fetchOneRepo(repo.full_name)
+  return repositorySerializer(response.data)
+})

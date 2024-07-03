@@ -13,6 +13,7 @@ import {
 
 import RepositoryItem from './RepositoryItem';
 import Loader from '../../components/Loader'
+import ErrorDismissableAlert from '../../components/ErrorDismissableAlert'
 
 const ListRepositories = ({ searchText }) => {
   const dispatch = useDispatch()
@@ -20,6 +21,7 @@ const ListRepositories = ({ searchText }) => {
   const repositoriesStatus = useSelector(state => state.repositories.status)
   const repos = useSelector(selectAllRepositories)
   const repoIds = useSelector(selectRepositoryIds)
+  const error = useSelector(state => state.repositories.error)
 
   const [ containerRef, isVisible ] = useElementOnScreen({
     root: null,
@@ -50,7 +52,7 @@ const ListRepositories = ({ searchText }) => {
       content = <Loader text={'Loading...'}/>
       break;
     case 'failed':
-      content = <div>{error}</div>
+      content = <ErrorDismissableAlert message={error} />
       break;
     default:
       content = ''

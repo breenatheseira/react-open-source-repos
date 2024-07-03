@@ -12,11 +12,12 @@ import {
 } from './repositoriesSlice'
 
 import RepositoryItem from './RepositoryItem';
+import Loader from '../../components/Loader'
 
 const ListRepositories = ({ searchText }) => {
   const dispatch = useDispatch()
 
-  const isLoading = useSelector(state => state.repositories.status)
+  const repositoriesStatus = useSelector(state => state.repositories.status)
   const repos = useSelector(selectAllRepositories)
   const repoIds = useSelector(selectRepositoryIds)
 
@@ -28,7 +29,7 @@ const ListRepositories = ({ searchText }) => {
 
   // fetch for the first time, or when end of page is reached
   useEffect(() => {
-    if(isLoading === 'idle' || isVisible){
+    if(repositoriesStatus === 'idle' || isVisible){
       dispatch(fetchRepositories())
     }
   }, [isVisible])
@@ -42,14 +43,30 @@ const ListRepositories = ({ searchText }) => {
     return;
   });
 
+  let content
+
+  switch(repositoriesStatus){
+    case 'loading':
+      content = <Loader text={'Loading...'}/>
+      break;
+    case 'failed':
+      content = <div>{error}</div>
+      break;
+    default:
+      content = ''
+      break;
+  }
+
   return (
     <>
       <div className='pb-5 text-center'>
         <span>Repositories Loaded: {' '}{repos.length}</span>
       </div>
+      {content}
       {(repoIds.length > 0) ? (
         <Accordion defaultActiveKey={repoIds && repoIds[0]}>
           {results}
+          {content}
           <div ref={containerRef}></div>
         </Accordion>
       ) : (

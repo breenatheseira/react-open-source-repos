@@ -31,6 +31,9 @@ const ListRepositories = ({ searchText }) => {
 
   // fetch for the first time, or when end of page is reached
   useEffect(() => {
+    if(repositoriesStatus === 'fully_loaded'){
+      return
+    }
     if(repositoriesStatus === 'idle' || isVisible){
       dispatch(fetchRepositories())
     }
@@ -62,9 +65,9 @@ const ListRepositories = ({ searchText }) => {
   return (
     <>
       <div className='pb-5 text-center'>
-        <span>Repositories Loaded: {' '}{repos.length}</span>
+        <span>Repositories Loaded: {' '}{repoIds.length}</span>
       </div>
-      {content}
+      {(repoIds.length === 0) ? (content) : (<></>)}
       {(repoIds.length > 0) ? (
         <Accordion defaultActiveKey={repoIds && repoIds[0]}>
           {results}

@@ -5,6 +5,7 @@ import {
 } from '@reduxjs/toolkit'
 
 import fetchInitialRepos from '../../utils/githubApi';
+import { repositorySerializer } from './repositorySerializer'
 
 const repositoriesAdapter = createEntityAdapter()
 
@@ -55,5 +56,10 @@ export const fetchRepositories = createAsyncThunk('repositories/fetchRepositorie
   const page = getState().repositories.currentPage + 1
   console.log('fetching repos, page: ' + page)
   const response = await fetchInitialRepos(page)
-  return { data: response.data, page }
+
+  return { data: formatManyRepositories(response.data), page }
 })
+
+function formatManyRepositories(repositoriesArray){
+  return repositoriesArray.map(repo => repositorySerializer(repo))
+}

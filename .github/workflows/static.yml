@@ -24,6 +24,7 @@ env:
   USERNAME: ${{ github.repository_owner }}
   VITE_REPO_NAME: /${{ github.event.repository.name }}/
   VITE_API_URL: ${{ github.api_url }}
+  VITE_GITHUB_BEARER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   # Single deploy job since we're just deploying

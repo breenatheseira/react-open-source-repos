@@ -15,14 +15,14 @@ const Homepage = () => {
         </div>
       </div>
       <div className="container">
-        <div className="row w-50 mx-auto">
+        <div className="row w-50 mx-auto" style={{minWidth: '250px'}}>
           <SearchBar 
             searchText={searchText}
             onSearchTextChange={setSearchText} />
         </div>
       </div>
       <div className="container py-5">
-        <div className="row w-75 mx-auto">
+        <div className="row w-75 mx-auto" style={{minWidth: '300px', maxWidth: '700px'}}>
           <ListRepositories
             searchText={searchText}
           />

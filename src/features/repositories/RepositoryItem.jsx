@@ -34,21 +34,19 @@ const RepositoryItem = ({ repo }) => {
   return (
     <Accordion.Item eventKey={repo.id}>
       <Accordion.Header>
-        <span className='me-2'><b>{repo.name}</b>:</span>
+        <span><b>{repo.name}</b></span>
         <span className='d-none d-md-block text-truncate text-break' style={{maxWidth: '25em'}}>
-          <small className='text-center fs-7 fw-light'>{shortDesc}</small>
+          <small className='text-center fs-7 fw-light'>:{' '}{shortDesc}</small>
         </span>
       </Accordion.Header>
       <Accordion.Body>
         <div className='d-flex'>
           <div className="flex-grow-1 bd-highlight me-3">
-            <span>
-              <a href={repo.html_url} target='_blank' className='mb-2'>Check it out</a>
-            </span>
+            <a href={repo.html_url} target='_blank' className='mb-2'>Check it out</a>
             <br/>
-            <span className='d-md-none pt-3'>
+            <div className='d-md-none pt-3'>
               {repo.description}
-            </span>
+            </div>
           </div>
           <div className='d-flex flex-md-row flex-column justify-content-md-end'>
             <Badge bg="info" className='rounded-pill align-self-center mb-1 me-2 fs-7'>{repo.language}</Badge>

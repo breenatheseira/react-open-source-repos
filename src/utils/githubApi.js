@@ -21,7 +21,7 @@ if(import.meta.env.VITE_GITHUB_BEARER_TOKEN){
   options.headers['Authorization'] = 'Bearer ' + import.meta.env.VITE_GITHUB_BEARER_TOKEN
 }
 
-export async function fetchInitialRepos(page){
+export async function fetchInitialRepos(page = 1){
   const path = allReactReposPath
 
   options.params = {
@@ -35,6 +35,17 @@ export async function fetchInitialRepos(page){
 export async function fetchOneRepo(fullName){
   const path = getRepoByIdPath + fullName
   options.params = {}
+
+  return axios.get(path, options)
+}
+
+export async function searchForRepository(query, page = 1){
+  const path = searchRepoPath
+  const defaultQueryString = 'in:name+org:reactjs+'
+  options.params = {
+    q: defaultQueryString + query,
+    page
+  }
 
   return axios.get(path, options)
 }

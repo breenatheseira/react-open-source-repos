@@ -7,6 +7,7 @@ import {
 import {
   fetchInitialRepos,
   fetchOneRepo,
+  searchForRepository,
 } from '../../utils/githubApi';
 
 import { repositorySerializer } from './repositorySerializer'
@@ -16,13 +17,18 @@ const repositoriesAdapter = createEntityAdapter()
 const initialState = repositoriesAdapter.getInitialState({
   currentPage: 0,
   status: 'idle',
-  error: null
+  searchStatus: 'idle',
+  error: null,
 })
 
 const repositoriesSlice = createSlice({
   name: 'repositories',
   initialState,
-  reducers: () => {},
+  reducers: {
+    clearError(state, action){
+      state.error = null
+    }
+  },
   extraReducers(builder){
     builder
       .addCase(fetchRepositories.pending, (state, action) => {
@@ -45,6 +51,13 @@ const repositoriesSlice = createSlice({
         const id = action.meta.arg
         state.entities[id].subscribers_status = 'failed'
         console.log(action.error.message)
+      })
+      .addCase(searchRepositories.pending, (state, action) => {
+        state.searchStatus = 'loading'
+      })
+      .addCase(searchRepositories.fulfilled, (state, action) => {
+        const results = action.payload
+        repositoriesAdapter.upsertMany(state, results)
       })
   }
 })
@@ -81,4 +94,10 @@ export const fetchRepository = createAsyncThunk('repositories/fetchRepository', 
   } 
   const response = await fetchOneRepo(repo.fullName)
   return repositorySerializer(response.data)
+})
+
+export const searchRepositories = createAsyncThunk('repositories/searchRepositories', async (query) => {
+  const response = await searchForRepository(query)
+  const returnedRepositories = response.data.items
+  return formatManyRepositories(returnedRepositories)
 })

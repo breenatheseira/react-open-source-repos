@@ -30,11 +30,8 @@ const repositoriesSlice = createSlice({
       })
       .addCase(fetchRepositories.fulfilled, (state, action) => {
         const loadedRepos = action.payload.data
-        if(loadedRepos.length === 0){
-          state.status = 'fully_loaded'
-          return
-        }
-        state.status = 'succeeded'
+        const linksString = action.payload.pageLinks
+        state.status = (linksString && linksString.includes('last')) ? 'succeeded' : 'fully_loaded'
         repositoriesAdapter.upsertMany(state, loadedRepos)
         state.currentPage = action.payload.page
       })
@@ -72,7 +69,7 @@ export const fetchRepositories = createAsyncThunk('repositories/fetchRepositorie
   console.log('fetching repos, page: ' + page)
   const response = await fetchInitialRepos(page)
 
-  return { data: formatManyRepositories(response.data), page }
+  return { data: formatManyRepositories(response.data), page, pageLinks: response.headers.link }
 })
 
 function formatManyRepositories(repositoriesArray){

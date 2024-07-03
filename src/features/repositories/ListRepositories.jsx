@@ -45,7 +45,7 @@ const ListRepositories = ({ searchText }) => {
           }
         })
         .catch(e => {
-          console.log(e.error_message)
+          console.log(e)
         })
     }
   }, [isVisible])

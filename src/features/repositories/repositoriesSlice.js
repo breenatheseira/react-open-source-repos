@@ -40,10 +40,7 @@ const repositoriesSlice = createSlice({
         state.error = action.error.message
         console.log(action.error)
       })
-      .addCase(fetchRepository.fulfilled, (state, action) => {
-        const id = action.payload.id
-        state.entities[id] = action.payload
-      })
+      .addCase(fetchRepository.fulfilled, repositoriesAdapter.setOne)
       .addCase(fetchRepository.rejected, (state, action) => {
         const id = action.meta.arg
         state.entities[id].subscribers_status = 'failed'
@@ -82,6 +79,6 @@ export const fetchRepository = createAsyncThunk('repositories/fetchRepository', 
   if(repo.subscribers_status === 'loaded'){
     return repo
   } 
-  const response = await fetchOneRepo(repo.full_name)
+  const response = await fetchOneRepo(repo.fullName)
   return repositorySerializer(response.data)
 })

@@ -1,6 +1,6 @@
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
-import reactIcon from '../assets/react.svg'
+import reactIcon from '../assets/images/react.svg'
 
 export default function Header(){
   return (

@@ -7,8 +7,6 @@ const SearchRepositories = ({ identifier, initialText, text, setText }) => {
   const dispatch = useDispatch()
 
   function handleDebounce(trimmedText){
-    console.log('handleEnterDown')
-    console.log(trimmedText)
     dispatch(searchRepositories(trimmedText))
   }
 

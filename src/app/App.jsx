@@ -14,9 +14,11 @@ export default function App() {
   return (
     <BrowserRouter>
       <Header />
-      <Routes>
-        <Route path='/' element={<Homepage />} />
-      </Routes>
+      <div id="body-content">
+        <Routes>
+          <Route path='/' element={<Homepage />} />
+        </Routes>
+      </div>
       <Footer />
     </BrowserRouter>
   )

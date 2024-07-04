@@ -1,9 +1,9 @@
 import Accordion from 'react-bootstrap/Accordion';
 import Badge from 'react-bootstrap/Badge';
 
-import eyeIcon from '../../assets/eye.svg'
-import starIcon from '../../assets/star.svg'
-import forkIcon from '../../assets/fork.svg'
+import eyeIcon from '../../assets/images/eye.svg'
+import starIcon from '../../assets/images/star.svg'
+import forkIcon from '../../assets/images/fork.svg'
 
 const BadgeStat = ({ stat, icon, text }) => {
 

@@ -1,30 +1,13 @@
-import { useRef, useState } from "react"
-import { useSearchParams } from "react-router-dom"
+import { useState } from "react"
 
 import ListRepositories from '../../features/repositories/ListRepositories'
 import SearchRepositories from '../../features/repositories/SearchRepositories'
 
 const Homepage = () => {
-  const identifier = 'repoSearchInput'
   const [searchText, setSearchText] = useState('')
-  const [searchParams, setSearchParams] = useSearchParams();
-  const refParams = useRef(null)
-  
-  if(refParams.current === null){
-    let params = new URLSearchParams(location.search)
-    if (params.has('q')){
-      refParams.current = params.get('q')
-      setSearchText(refParams.current)
-    }
-  }
 
   function handleTextChange(value){
-    const trimmedValue = value.trim()
-    const params = trimmedValue === '' ? {} : { q: value.trim() }
-    const isFirstSearch = value == null
-
     setSearchText(value)
-    setSearchParams(params, { replace: !isFirstSearch })
   }
 
   return (
@@ -37,9 +20,7 @@ const Homepage = () => {
       </div>
       <div className="container">
         <div className="row w-50 mx-auto" style={{minWidth: '250px'}}>
-          <SearchRepositories 
-            initialText={refParams.current}
-            identifier={identifier}
+          <SearchRepositories
             text={searchText}
             setText={handleTextChange} />
         </div>

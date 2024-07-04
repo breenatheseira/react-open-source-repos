@@ -59,7 +59,12 @@ const repositoriesSlice = createSlice({
       })
       .addCase(searchRepositories.fulfilled, (state, action) => {
         const results = action.payload
-        repositoriesAdapter.upsertMany(state, results)
+        results.forEach(result => {
+          if(state.ids.includes(result.id)){
+            return
+          }
+          state.entities[result.id] = result
+        })
       })
       .addCase(searchRepositories.rejected, (state, action) => {
         state.searchStatus = 'failed'
@@ -109,17 +114,14 @@ export const searchRepositories = createAsyncThunk('repositories/searchRepositor
   let repositories = []
 
   let response = await searchForRepository(query, page)
+  repositories = repositories.concat(response.data.items)
   const totalCount = response.data.total_count
   let continueCalling = totalCount > repositories.length
-  repositories = repositories.concat(response.data.items)
-  console.log('totalCount: ', totalCount)
 
   while(continueCalling){
     page = page + 1
     response = await searchForRepository(query, page)
     repositories = repositories.concat(response.data.items)
-    console.log('repositories.length: ', repositories.length)
-    console.log(continueCalling)
     continueCalling = totalCount > repositories.length
   }
 

@@ -105,7 +105,23 @@ export const fetchRepository = createAsyncThunk('repositories/fetchRepository', 
 
 export const searchRepositories = createAsyncThunk('repositories/searchRepositories', async (query) => {
   // TODO: implement recursive searching
-  const response = await searchForRepository(query)
-  const returnedRepositories = response.data.items
-  return formatManyRepositories(returnedRepositories)
+  let page = 1
+  let repositories = []
+
+  let response = await searchForRepository(query, page)
+  const totalCount = response.data.total_count
+  let continueCalling = totalCount > repositories.length
+  repositories = repositories.concat(response.data.items)
+  console.log('totalCount: ', totalCount)
+
+  while(continueCalling){
+    page = page + 1
+    response = await searchForRepository(query, page)
+    repositories = repositories.concat(response.data.items)
+    console.log('repositories.length: ', repositories.length)
+    console.log(continueCalling)
+    continueCalling = totalCount > repositories.length
+  }
+
+  return formatManyRepositories(repositories)
 })

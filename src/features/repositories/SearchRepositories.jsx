@@ -5,14 +5,21 @@ import { searchRepositories } from "./repositoriesSlice"
 
 const SearchRepositories = ({ identifier, initialText, text, setText }) => {
   const dispatch = useDispatch()
+  const isinitialTextValid = (initialText !== null && initialText !== '' && initialText !== undefined && initialText.length > 1)
 
   function handleDebounce(trimmedText){
+    console.log(trimmedText)
+    if(trimmedText === '' || trimmedText === null){
+      return
+    }
     dispatch(searchRepositories(trimmedText))
   }
 
   useEffect(() =>{
-    dispatch(searchRepositories(initialText))
-  },[initialText])
+    if(isinitialTextValid){
+      dispatch(searchRepositories(initialText))
+    }
+  },[isinitialTextValid])
 
   return (
     <SearchBar 

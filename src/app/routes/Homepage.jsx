@@ -1,10 +1,14 @@
-import SearchBar from '../../components/SearchBar'
-import ListRepositories from '../../features/repositories/ListRepositories'
-
 import { useState } from "react"
+
+import ListRepositories from '../../features/repositories/ListRepositories'
+import SearchRepositories from '../../features/repositories/SearchRepositories'
 
 const Homepage = () => {
   const [searchText, setSearchText] = useState('')
+
+  function handleTextChange(value){
+    setSearchText(value)
+  }
 
   return (
     <>
@@ -16,9 +20,9 @@ const Homepage = () => {
       </div>
       <div className="container">
         <div className="row w-50 mx-auto" style={{minWidth: '250px'}}>
-          <SearchBar 
-            searchText={searchText}
-            onSearchTextChange={setSearchText} />
+          <SearchRepositories
+            text={searchText}
+            setText={handleTextChange} />
         </div>
       </div>
       <div className="container py-5">

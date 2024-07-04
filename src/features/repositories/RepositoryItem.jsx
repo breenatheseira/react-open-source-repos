@@ -1,9 +1,9 @@
 import Accordion from 'react-bootstrap/Accordion';
 import Badge from 'react-bootstrap/Badge';
 
-import eyeIcon from '../../assets/eye.svg'
-import starIcon from '../../assets/star.svg'
-import forkIcon from '../../assets/fork.svg'
+import eyeIcon from '../../assets/images/eye.svg'
+import starIcon from '../../assets/images/star.svg'
+import forkIcon from '../../assets/images/fork.svg'
 
 const BadgeStat = ({ stat, icon, text }) => {
 
@@ -42,7 +42,7 @@ const RepositoryItem = ({ repo }) => {
       <Accordion.Body>
         <div className='d-flex'>
           <div className="flex-grow-1 bd-highlight me-3">
-            <a href={repo.html_url} target='_blank' className='mb-2'>Check it out</a>
+            <a href={repo.url} target='_blank' className='mb-2'>Check it out</a>
             <br/>
             <div className='d-md-none pt-3'>
               {repo.description}
@@ -51,19 +51,19 @@ const RepositoryItem = ({ repo }) => {
           <div className='d-flex flex-md-row flex-column justify-content-md-end'>
             <Badge bg="info" className='rounded-pill align-self-center mb-1 me-2 fs-7'>{repo.language}</Badge>
             <BadgeStat
-              stat={repo.subscribers_count || 0}
+              stat={repo.watchers || 0}
               icon={eyeIcon}
               text={'Watchers'}
             />
             <BadgeStat
-              stat={repo.stargazers_count}
-              icon={starIcon}
-              text={'Starred'}
-            />
-            <BadgeStat
-              stat={repo.forks_count}
+              stat={repo.forked}
               icon={forkIcon}
               text={'Forked'}
+            />
+            <BadgeStat
+              stat={repo.starred}
+              icon={starIcon}
+              text={'Starred'}
             />
           </div>
         </div>

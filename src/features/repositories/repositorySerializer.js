@@ -9,13 +9,13 @@ export const repositorySerializer = (repository) => {
   return {
     id: repository.id,
     name: repository.name,
-    full_name: repository.full_name,
+    fullName: repository.full_name,
     description: repository.description,
     language: repository.language,
-    html_url: repository.html_url,
-    stargazers_count: repository.stargazers_count,
-    subscribers_count: subCount,
-    forks_count: repository.forks_count,
-    subscribers_status: subStatus
+    url: repository.html_url,
+    starred: repository.stargazers_count,
+    watchers: subCount,
+    forked: repository.forks_count,
+    subscribersStatus: subStatus
   }
 }

@@ -7,22 +7,30 @@ import {
 import {
   fetchInitialRepos,
   fetchOneRepo,
+  searchForRepository,
 } from '../../utils/githubApi';
 
 import { repositorySerializer } from './repositorySerializer'
 
-const repositoriesAdapter = createEntityAdapter()
+const repositoriesAdapter = createEntityAdapter({
+  sortComparer: (a,b) => a.name.localeCompare(b.name)
+})
 
 const initialState = repositoriesAdapter.getInitialState({
   currentPage: 0,
   status: 'idle',
-  error: null
+  searchStatus: 'idle',
+  error: null,
 })
 
 const repositoriesSlice = createSlice({
   name: 'repositories',
   initialState,
-  reducers: () => {},
+  reducers: {
+    clearError(state, action){
+      state.error = null
+    }
+  },
   extraReducers(builder){
     builder
       .addCase(fetchRepositories.pending, (state, action) => {
@@ -40,14 +48,28 @@ const repositoriesSlice = createSlice({
         state.error = action.error.message
         console.log(action.error)
       })
-      .addCase(fetchRepository.fulfilled, (state, action) => {
-        const id = action.payload.id
-        state.entities[id] = action.payload
-      })
+      .addCase(fetchRepository.fulfilled, repositoriesAdapter.setOne)
       .addCase(fetchRepository.rejected, (state, action) => {
         const id = action.meta.arg
         state.entities[id].subscribers_status = 'failed'
         console.log(action.error.message)
+      })
+      .addCase(searchRepositories.pending, (state, action) => {
+        state.searchStatus = 'loading'
+      })
+      .addCase(searchRepositories.fulfilled, (state, action) => {
+        const results = action.payload
+        results.forEach(result => {
+          if(state.ids.includes(result.id)){
+            return
+          }
+          state.entities[result.id] = result
+        })
+      })
+      .addCase(searchRepositories.rejected, (state, action) => {
+        state.searchStatus = 'failed'
+        state.error = action.error.message
+        console.log(action.error)
       })
   }
 })
@@ -82,6 +104,26 @@ export const fetchRepository = createAsyncThunk('repositories/fetchRepository', 
   if(repo.subscribers_status === 'loaded'){
     return repo
   } 
-  const response = await fetchOneRepo(repo.full_name)
+  const response = await fetchOneRepo(repo.fullName)
   return repositorySerializer(response.data)
+})
+
+export const searchRepositories = createAsyncThunk('repositories/searchRepositories', async (query) => {
+  // TODO: implement recursive searching
+  let page = 1
+  let repositories = []
+
+  let response = await searchForRepository(query, page)
+  repositories = repositories.concat(response.data.items)
+  const totalCount = response.data.total_count
+  let continueCalling = totalCount > repositories.length
+
+  while(continueCalling){
+    page = page + 1
+    response = await searchForRepository(query, page)
+    repositories = repositories.concat(response.data.items)
+    continueCalling = totalCount > repositories.length
+  }
+
+  return formatManyRepositories(repositories)
 })

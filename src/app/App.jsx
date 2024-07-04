@@ -16,7 +16,9 @@ export default function App() {
       <Header />
       <div id="body-content">
         <Routes>
-          <Route path='/' element={<Homepage />} />
+          <Route path={import.meta.env.VITE_REPO_NAME}>
+            <Route path="" element={<Homepage />} />
+          </Route>
         </Routes>
       </div>
       <Footer />

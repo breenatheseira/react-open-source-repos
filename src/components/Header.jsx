@@ -6,7 +6,7 @@ export default function Header(){
   return (
     <Navbar expand="lg" className="bg-body-tertiary">
       <Container>
-        <Navbar.Brand href="/">
+        <Navbar.Brand href={import.meta.env.VITE_REPO_NAME}>
           <img
             alt="ReactJS logo"
             src={reactIcon}

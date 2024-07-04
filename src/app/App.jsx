@@ -19,6 +19,7 @@ export default function App() {
           <Route path={import.meta.env.VITE_REPO_NAME}>
             <Route path="" element={<Homepage />} />
           </Route>
+          <Route path='*' element={<Homepage />}/>
         </Routes>
       </div>
       <Footer />

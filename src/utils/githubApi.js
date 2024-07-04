@@ -23,29 +23,27 @@ if(import.meta.env.VITE_GITHUB_BEARER_TOKEN){
 
 export async function fetchInitialRepos(page = 1){
   const path = allReactReposPath
+  const requestOptions = options
 
-  options.params = {
+  requestOptions.params = {
     sort: 'full_name',
     page
   };
 
-  return axios.get(path, options);
+  return axios.get(path, requestOptions);
 }
 
 export async function fetchOneRepo(fullName){
   const path = getRepoByIdPath + fullName
-  options.params = {}
+  const requestOptions = options
 
-  return axios.get(path, options)
+  return axios.get(path, requestOptions)
 }
 
 export async function searchForRepository(query, page = 1){
-  const path = searchRepoPath
-  const defaultQueryString = 'in:name+org:reactjs+'
-  options.params = {
-    q: defaultQueryString + query,
-    page
-  }
-
-  return axios.get(path, options)
+  const searchQuery = 'in:name org:reactjs ' + query
+  const searchOptions = options
+  searchOptions.params = { q: searchQuery, page }
+  
+  return axios.get(searchRepoPath, searchOptions)
 }

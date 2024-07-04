@@ -1,15 +1,27 @@
-import Form from 'react-bootstrap/Form';
+const SearchBar = ({ searchText, onSearchTextChange, onEnterDown }) => {
 
-export default function SearchBar({ searchText, onSearchTextChange }){
+  function handleOnChange(e){ 
+    onSearchTextChange(e.target.value) 
+  }
+  function handleOnKeyDown(e){
+    const trimmedText = e.target.value.trim()
+
+    // If user pressed Enter key
+    if (e.which === 13 && trimmedText) {
+      onEnterDown(trimmedText)
+    }
+  }
+
   return (
-    <Form>
-      <Form.Control 
-        size="lg" 
-        type="text" 
-        value={searchText}
-        onChange={ (e) => { onSearchTextChange(e.target.value) } }
-        placeholder="Search..."
-      />
-    </Form>
+    <input 
+      className="form-control form-control-lg"
+      type="text" 
+      value={searchText}
+      onKeyDown={handleOnKeyDown}
+      onChange={handleOnChange}
+      placeholder="Search..."
+    />
   )
 }
+
+export default SearchBar

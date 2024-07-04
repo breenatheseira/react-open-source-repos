@@ -59,6 +59,11 @@ const repositoriesSlice = createSlice({
         const results = action.payload
         repositoriesAdapter.upsertMany(state, results)
       })
+      .addCase(searchRepositories.rejected, (state, action) => {
+        state.searchStatus = 'failed'
+        state.error = action.error.message
+        console.log(action.error)
+      })
   }
 })
 
@@ -97,6 +102,7 @@ export const fetchRepository = createAsyncThunk('repositories/fetchRepository', 
 })
 
 export const searchRepositories = createAsyncThunk('repositories/searchRepositories', async (query) => {
+  // TODO: implement recursive searching
   const response = await searchForRepository(query)
   const returnedRepositories = response.data.items
   return formatManyRepositories(returnedRepositories)

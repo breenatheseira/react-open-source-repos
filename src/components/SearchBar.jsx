@@ -1,13 +1,12 @@
 import useDebounce from "../hooks/useDebounce";
 
-const SearchBar = ({ searchText, onSearchTextChange, onEnterDown }) => {
+const SearchBar = ({ identifier, searchText, onSearchTextChange, onDebounceChange }) => {
 
   const debouncedRequest = useDebounce(() => {
     // send request to the backend
     // access to latest state here
     const trimmedText = searchText.trim()
-    console.log(trimmedText);
-    onEnterDown(trimmedText)
+    onDebounceChange(trimmedText)
   });
 
   function handleOnChange(e){ 
@@ -16,7 +15,8 @@ const SearchBar = ({ searchText, onSearchTextChange, onEnterDown }) => {
   }  
 
   return (
-    <input 
+    <input
+      id={identifier} 
       className="form-control form-control-lg"
       type="text" 
       value={searchText}

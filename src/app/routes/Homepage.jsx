@@ -1,17 +1,31 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
+import { useSearchParams } from "react-router-dom"
 
 import ListRepositories from '../../features/repositories/ListRepositories'
 import SearchRepositories from '../../features/repositories/SearchRepositories'
 
-
 const Homepage = () => {
+  const identifier = 'repoSearchInput'
   const [searchText, setSearchText] = useState('')
-  // const dispatch = useDispatch()
+  const [searchParams, setSearchParams] = useSearchParams();
+  const refParams = useRef(null)
+  
+  if(refParams.current === null){
+    let params = new URLSearchParams(location.search)
+    if (params.has('q')){
+      refParams.current = params.get('q')
+      setSearchText(refParams.current)
+    }
+  }
 
-  // function handleSearchTextChanged(value){
-  //   dispatch(searchRepositories(value))
-  //   setSearchText(value)
-  // }
+  function handleTextChange(value){
+    const trimmedValue = value.trim()
+    const params = trimmedValue === '' ? {} : { q: value.trim() }
+    const isFirstSearch = value == null
+
+    setSearchText(value)
+    setSearchParams(params, { replace: !isFirstSearch })
+  }
 
   return (
     <>
@@ -24,8 +38,10 @@ const Homepage = () => {
       <div className="container">
         <div className="row w-50 mx-auto" style={{minWidth: '250px'}}>
           <SearchRepositories 
+            initialText={refParams.current}
+            identifier={identifier}
             text={searchText}
-            setText={setSearchText} />
+            setText={handleTextChange} />
         </div>
       </div>
       <div className="container py-5">

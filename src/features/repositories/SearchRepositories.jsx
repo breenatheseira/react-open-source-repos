@@ -1,21 +1,27 @@
+import { useEffect } from "react"
 import { useDispatch } from "react-redux"
 import SearchBar from "../../components/SearchBar"
 import { searchRepositories } from "./repositoriesSlice"
 
-const SearchRepositories = ({ text, setText }) => {
+const SearchRepositories = ({ identifier, initialText, text, setText }) => {
   const dispatch = useDispatch()
 
-  function handleEnterDown(trimmedText){
+  function handleDebounce(trimmedText){
     console.log('handleEnterDown')
     console.log(trimmedText)
     dispatch(searchRepositories(trimmedText))
   }
 
+  useEffect(() =>{
+    dispatch(searchRepositories(initialText))
+  },[initialText])
+
   return (
     <SearchBar 
+      identifier={identifier}
       searchText={text}
       onSearchTextChange={setText}
-      onEnterDown={handleEnterDown}
+      onDebounceChange={handleDebounce}
       placeholder='Press Enter to Search'
     />
   )

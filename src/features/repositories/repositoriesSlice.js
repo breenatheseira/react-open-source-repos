@@ -12,7 +12,9 @@ import {
 
 import { repositorySerializer } from './repositorySerializer'
 
-const repositoriesAdapter = createEntityAdapter()
+const repositoriesAdapter = createEntityAdapter({
+  sortComparer: (a,b) => a.name.localeCompare(b.name)
+})
 
 const initialState = repositoriesAdapter.getInitialState({
   currentPage: 0,

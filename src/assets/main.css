@@ -1,0 +1,4 @@
+/* 160.8px is the height of both header & footer combined */
+#body-content {
+  min-height: calc(100vh - 160.8px);
+}

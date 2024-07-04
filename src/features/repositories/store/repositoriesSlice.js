@@ -6,7 +6,7 @@ import {
 
 import githubApi from '../../../utils/githubApi';
 
-import { repositorySerializer } from './repositorySerializer'
+import { formatManyRepositories, formatRepository } from './repositorySerializer'
 
 const repositoriesAdapter = createEntityAdapter({
   sortComparer: (a,b) => a.name.localeCompare(b.name)
@@ -86,10 +86,6 @@ export const fetchRepositories = createAsyncThunk('repositories/fetchRepositorie
   return { data: formatManyRepositories(response.data), page, pageLinks: response.headers.link }
 })
 
-function formatManyRepositories(repositoriesArray){
-  return repositoriesArray.map(repo => repositorySerializer(repo))
-}
-
 export const fetchRepository = createAsyncThunk('repositories/fetchRepository', async (id, { getState }) => {
   const repo = getState().repositories.entities[id]
 
@@ -97,7 +93,7 @@ export const fetchRepository = createAsyncThunk('repositories/fetchRepository', 
     return repo
   } 
   const response = await githubApi.fetchOneRepo(repo.fullName)
-  return repositorySerializer(response.data)
+  return formatRepository(response.data)
 })
 
 export const searchRepositories = createAsyncThunk('repositories/searchRepositories', async (query, { getState }) => {

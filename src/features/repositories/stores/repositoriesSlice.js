@@ -2,9 +2,11 @@ import {
   createSlice,
   createEntityAdapter,
   createAsyncThunk,
+  createSelector,
 } from '@reduxjs/toolkit'
 
 import githubApi from '../../../utils/githubApi';
+import { fetchRepos } from './repositoryActions'
 
 import { formatManyRepositories, formatRepository } from './repositorySerializer'
 
@@ -29,20 +31,26 @@ const repositoriesSlice = createSlice({
   },
   extraReducers(builder){
     builder
-      .addCase(fetchRepositories.pending, (state, action) => {
+      .addCase(fetchRepos.start, (state, action) => {
+        if(state.status === 'fully_loaded'){
+          return state
+        }
         state.status = 'loading'
       })
-      .addCase(fetchRepositories.fulfilled, (state, action) => {
-        const loadedRepos = action.payload.data
-        const linksString = action.payload.pageLinks
-        state.status = (linksString && linksString.includes('last')) ? 'succeeded' : 'fully_loaded'
-        repositoriesAdapter.upsertMany(state, loadedRepos)
+      .addCase(fetchRepos.fulfilled, (state, action) => {
+        state.status = 'succeeded'
         state.currentPage = action.payload.page
+        repositoriesAdapter.upsertMany(state, action.payload.data)
       })
-      .addCase(fetchRepositories.rejected, (state, action) => {
+      .addCase(fetchRepos.rejected, (state, action) => {
         state.status = 'failed'
         state.error = action.error.message
         console.log(action.error)
+      })
+      .addCase(fetchRepos.completed, (state, action) => {
+        state.status = 'fully_loaded'
+        state.currentPage = action.payload.page
+        repositoriesAdapter.upsertMany(state, action.payload.data)
       })
       .addCase(fetchRepository.fulfilled, repositoriesAdapter.setOne)
       .addCase(fetchRepository.rejected, (state, action) => {
@@ -74,17 +82,8 @@ export const {
   selectById: selectRepositoryById,
 } = repositoriesAdapter.getSelectors(state => state.repositories)
 
-export const fetchRepositories = createAsyncThunk('repositories/fetchRepositories', async (dispatch, { getState }) => {
-  const status = getState().repositories.status
-  if(status === 'fully_loaded'){
-    return
-  }
-  const page = getState().repositories.currentPage + 1
-  console.log('fetching repos, page: ' + page)
-  const response = await githubApi.fetchRepos(page)
-  console.log(response)
-  return { data: formatManyRepositories(response.data), page, pageLinks: response.headers.link }
-})
+export const selectRepositoriesStatus = (state) => state.repositories.status
+export const selectRepositoriesPage = (state) => state.repositories.currentPage
 
 export const fetchRepository = createAsyncThunk('repositories/fetchRepository', async (id, { getState }) => {
   const repo = getState().repositories.entities[id]

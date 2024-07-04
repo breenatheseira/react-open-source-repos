@@ -1,16 +1,16 @@
-import useElementOnScreen from '../../hooks/useElementOnScreen'
-
-import Accordion from 'react-bootstrap/Accordion';
-
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 
-import { 
-  fetchRepositories, 
-  fetchRepository,
+import Accordion from 'react-bootstrap/Accordion';
+import useElementOnScreen from '../../hooks/useElementOnScreen'
+
+import { fetchRepos } from './stores/repositoryActions'
+
+import {
   selectAllRepositories, 
   selectRepositoryIds,
-} from './store/repositoriesSlice'
+  fetchRepository,
+} from './stores/repositoriesSlice'
 
 import RepositoryItem from './RepositoryItem';
 import Loader from '../../components/Loader'
@@ -33,21 +33,18 @@ const ListRepositories = ({ searchText }) => {
 
   // fetch for the first time, or when end of page is reached
   useEffect(() => {
-    if(repositoriesStatus === 'fully_loaded'){
-      return
-    }
     if(repositoriesStatus === 'idle' || isVisible){
-      dispatch(fetchRepositories())
-        .unwrap()
-        .then((response) => {
-          if(response.page === 1){
-            const id = response.data[0].id
-            dispatch(fetchRepository(id))
-          }
-        })
-        .catch(e => {
-          console.log(e)
-        })
+      dispatch(fetchRepos.start())
+        // .unwrap()
+        // .then((response) => {
+        //   if(response.page === 1){
+        //     const id = response.data[0].id
+        //     dispatch(fetchRepository(id))
+        //   }
+        // })
+        // .catch(e => {
+        //   console.log(e)
+        // })
     }
   }, [isVisible])
 
@@ -78,6 +75,9 @@ const ListRepositories = ({ searchText }) => {
 
   return (
     <>
+      loaded: {repos.length}
+      <br/>
+      status: {repositoriesStatus}
       <hr className='py-2' />
       {(repoIds.length === 0) ? (content) : (<></>)}
       {(repoIds.length > 0) ? (

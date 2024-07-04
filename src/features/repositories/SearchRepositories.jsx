@@ -1,7 +1,6 @@
-import { useEffect } from "react"
 import { useDispatch } from "react-redux"
 import SearchBar from "../../components/SearchBar"
-import { searchRepositories } from "./store/repositoriesSlice"
+import { searchRepositories } from "./stores/repositoriesSlice"
 
 const SearchRepositories = ({ text, setText }) => {
   const dispatch = useDispatch()

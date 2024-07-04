@@ -1,5 +1,5 @@
 
-import repositoriesReducer from '../features/repositories/store/repositoriesSlice'
+import repositoriesReducer from '../features/repositories/stores/repositoriesSlice'
 
 const reducer = {
   repositories: repositoriesReducer,

@@ -2,7 +2,7 @@ import useElementOnScreen from '../../hooks/useElementOnScreen'
 
 import Accordion from 'react-bootstrap/Accordion';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 
 import { 
@@ -20,6 +20,7 @@ const ListRepositories = ({ searchText }) => {
   const dispatch = useDispatch()
 
   const repositoriesStatus = useSelector(state => state.repositories.status)
+  const searchStatus = useSelector(state => state.repositories.searchStatus)
   const repos = useSelector(selectAllRepositories)
   const repoIds = useSelector(selectRepositoryIds)
   const error = useSelector(state => state.repositories.error)
@@ -59,17 +60,15 @@ const ListRepositories = ({ searchText }) => {
     return;
   });
 
-  let content
-  switch(repositoriesStatus){
-    case 'loading':
-      content = <Loader text={'Loading...'}/>
-      break;
-    case 'failed':
+  let content = ''
+  if(repositoriesStatus === 'loading' || searchStatus === 'loading'){
+    content = <Loader text={'Loading...'}/>
+  } else {
+    if(repositoriesStatus === 'failed' || searchStatus === 'failed'){
       content = <ErrorDismissableAlert message={error} />
-      break;
-    default:
+    } else {
       content = ''
-      break;
+    }
   }
 
   function handleOnSelect(repoId){
@@ -79,9 +78,7 @@ const ListRepositories = ({ searchText }) => {
 
   return (
     <>
-      <div className='pb-5 text-center'>
-        <span>Repositories Loaded: {' '}{repoIds.length}</span>
-      </div>
+      <hr className='py-2' />
       {(repoIds.length === 0) ? (content) : (<></>)}
       {(repoIds.length > 0) ? (
         <Accordion 
@@ -95,7 +92,6 @@ const ListRepositories = ({ searchText }) => {
       ) : (
         <></>
       )}
-      
     </>
   )
 }

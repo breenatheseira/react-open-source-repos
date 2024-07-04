@@ -7,7 +7,6 @@ const SearchRepositories = ({ text, setText }) => {
   const dispatch = useDispatch()
  
   function handleDebounce(trimmedText){
-    console.log(trimmedText)
     if(trimmedText === '' || trimmedText === null){
       return
     }

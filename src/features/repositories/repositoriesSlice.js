@@ -59,12 +59,8 @@ const repositoriesSlice = createSlice({
       })
       .addCase(searchRepositories.fulfilled, (state, action) => {
         const results = action.payload
-        results.forEach(result => {
-          if(state.ids.includes(result.id)){
-            return
-          }
-          state.entities[result.id] = result
-        })
+        repositoriesAdapter.addMany(state, results)
+        state.searchStatus = 'succeeded'
       })
       .addCase(searchRepositories.rejected, (state, action) => {
         state.searchStatus = 'failed'
@@ -101,15 +97,19 @@ function formatManyRepositories(repositoriesArray){
 export const fetchRepository = createAsyncThunk('repositories/fetchRepository', async (id, { getState }) => {
   const repo = getState().repositories.entities[id]
 
-  if(repo.subscribers_status === 'loaded'){
+  if(repo.subscribersStatus === 'loaded'){
     return repo
   } 
   const response = await fetchOneRepo(repo.fullName)
   return repositorySerializer(response.data)
 })
 
-export const searchRepositories = createAsyncThunk('repositories/searchRepositories', async (query) => {
-  // TODO: implement recursive searching
+export const searchRepositories = createAsyncThunk('repositories/searchRepositories', async (query, { getState }) => {
+  const status = getState().repositories.status
+  if(status === 'fully_loaded'){
+    return []
+  }
+  
   let page = 1
   let repositories = []
 

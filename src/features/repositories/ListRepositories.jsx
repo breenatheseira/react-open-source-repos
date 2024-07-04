@@ -10,7 +10,7 @@ import {
   fetchRepository,
   selectAllRepositories, 
   selectRepositoryIds,
-} from './repositoriesSlice'
+} from './store/repositoriesSlice'
 
 import RepositoryItem from './RepositoryItem';
 import Loader from '../../components/Loader'

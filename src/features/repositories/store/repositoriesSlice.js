@@ -4,11 +4,7 @@ import {
   createAsyncThunk,
 } from '@reduxjs/toolkit'
 
-import {
-  fetchInitialRepos,
-  fetchOneRepo,
-  searchForRepository,
-} from '../../utils/githubApi';
+import githubApi from '../../../utils/githubApi';
 
 import { repositorySerializer } from './repositorySerializer'
 
@@ -85,8 +81,8 @@ export const fetchRepositories = createAsyncThunk('repositories/fetchRepositorie
   }
   const page = getState().repositories.currentPage + 1
   console.log('fetching repos, page: ' + page)
-  const response = await fetchInitialRepos(page)
-
+  const response = await githubApi.fetchRepos(page)
+  console.log(response)
   return { data: formatManyRepositories(response.data), page, pageLinks: response.headers.link }
 })
 
@@ -100,7 +96,7 @@ export const fetchRepository = createAsyncThunk('repositories/fetchRepository', 
   if(repo.subscribersStatus === 'loaded'){
     return repo
   } 
-  const response = await fetchOneRepo(repo.fullName)
+  const response = await githubApi.fetchOneRepo(repo.fullName)
   return repositorySerializer(response.data)
 })
 
@@ -113,14 +109,14 @@ export const searchRepositories = createAsyncThunk('repositories/searchRepositor
   let page = 1
   let repositories = []
 
-  let response = await searchForRepository(query, page)
+  let response = await githubApi.searchForRepos(query, page)
   repositories = repositories.concat(response.data.items)
   const totalCount = response.data.total_count
   let continueCalling = totalCount > repositories.length
 
   while(continueCalling){
     page = page + 1
-    response = await searchForRepository(query, page)
+    response = await githubApi.searchForRepos(query, page)
     repositories = repositories.concat(response.data.items)
     continueCalling = totalCount > repositories.length
   }

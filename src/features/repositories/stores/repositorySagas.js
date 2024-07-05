@@ -1,4 +1,4 @@
-import { call, put, fork, select, take, takeEvery, cancel } from 'redux-saga/effects'
+import { call, put, fork, select, take, cancel, cancelled } from 'redux-saga/effects'
 
 import githubApi from '../../../utils/githubApi';
 import { fetchOneRepo, fetchRepos, searchRepos } from './repositoryActions'
@@ -11,9 +11,6 @@ import {
 
 import { formatRepositories, formatRepository } from './repositorySerializer'
 
-// export const delay = (ms) => new Promise(res => setTimeout(res, ms))
-// yield delay(1000)
-
 export function* loadOneRepository(){
   while(true){
     try{
@@ -21,6 +18,7 @@ export function* loadOneRepository(){
       const repository = yield select(selectRepositoryById, payload)
 
       if(repository.subscribersStatus === 'loaded'){
+        yield put(searchRepos.fulfilled([]))
         continue
       }
 
@@ -34,6 +32,42 @@ export function* loadOneRepository(){
     }
   }
 }
+
+export function* searchRepositoryList(){
+  while(true){
+    try {
+      const { type, payload } = yield take(searchRepos.start)
+
+      const fullyLoaded = yield select(selectRepositoriesLoadCompleted)
+      if(fullyLoaded){
+        continue
+      }
+
+      let page = 1
+      let repositories = []
+      let totalCount = 0
+      let response
+
+      do {
+        response = yield call (githubApi.searchForRepos, payload.trim(), page)
+        repositories = repositories.concat(response.data.items)
+        totalCount = response.data.total_count
+        page = page + 1
+      } while(totalCount > repositories.length)
+        
+      yield put(searchRepos.fulfilled(formatRepositories(repositories)))
+
+    } catch (error) {
+      console.log(error)
+      yield put(searchRepos.rejected(error))
+    } finally {
+      if (yield cancelled()){
+        yield put(searchRepos.fulfilled([]))
+      }
+    }
+  }
+}
+
 
 function isLastPage(linkString){
   return !(linkString && linkString.includes('last'))
@@ -71,7 +105,6 @@ export function* loadRepositoryList(){
       if(page === 1){
         yield put(fetchOneRepo.start(data[0].id))
       }
-      // load the first repo
     } catch (error) {
       console.log(error)
       yield put(fetchRepos.rejected(error))
@@ -80,10 +113,12 @@ export function* loadRepositoryList(){
 }
 
 export default function* repositorySagas(){
-  console.log('repositorySagas')
-  const loadList = yield fork(loadRepositoryList)
   const loadOne = yield fork(loadOneRepository)
+  
+  const loadList = yield fork(loadRepositoryList)
+  const searchList = yield fork(searchRepositoryList)
 
   yield take(fetchRepos.completed)
   yield cancel(loadList)
+  yield cancel(searchList)
 }

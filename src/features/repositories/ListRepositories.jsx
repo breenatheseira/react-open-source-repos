@@ -19,7 +19,7 @@ const ListRepositories = ({ searchText }) => {
   const dispatch = useDispatch()
 
   const repositoriesStatus = useSelector(state => state.repositories.status)
-  const searchStatus = useSelector(state => state.repositories.searchStatus)
+  const repositoriesFullyLoaded = useSelector(state => state.repositories.loadCompleted)
   const repos = useSelector(selectAllRepositories)
   const repoIds = useSelector(selectRepositoryIds)
   const error = useSelector(state => state.repositories.error)
@@ -49,7 +49,11 @@ const ListRepositories = ({ searchText }) => {
   let content = ''
   switch(repositoriesStatus){
     case 'loading':
-      content = <Loader text={'Loading...'}/>
+      if(!repositoriesFullyLoaded){
+        content = <Loader text={'Loading...'}/>
+      } else {
+        content = ''
+      }      
       break;
     case 'failed':
       content = <ErrorDismissableAlert message={error} />
@@ -61,22 +65,26 @@ const ListRepositories = ({ searchText }) => {
 
   return (
     <>
-      loaded: {repos.length}
-      <br/>
-      status: {repositoriesStatus}
       <hr className='py-2' />
-      {(repoIds.length === 0) ? (content) : (<></>)}
-      {(repoIds.length > 0) ? (
-        <Accordion 
-          defaultActiveKey={repoIds && repoIds[0]}
-        >
-          {results}
-          {content}
-          <div ref={containerRef}></div>
-        </Accordion>
-      ) : (
-        <></>
-      )}
+      { (searchText?.length > 0 && results.length === 0) ? (
+          <div className='text-center'>
+            <span>There are no repositories matching the search term.</span>{' '}
+            <span>Please try again.</span>
+          </div>
+        ) : (
+          (repoIds.length > 0) ? (
+            <Accordion 
+              defaultActiveKey={repoIds && repoIds[0]}
+            >
+              {(results)}
+              {content}
+              <div ref={containerRef}></div>
+            </Accordion>
+          ) : (
+            <></>
+          )
+        )
+      }
     </>
   )
 }

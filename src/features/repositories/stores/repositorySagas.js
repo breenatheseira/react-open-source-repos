@@ -4,7 +4,7 @@ import githubApi from '../../../utils/githubApi';
 import { fetchOneRepo, fetchRepos, searchRepos } from './repositoryActions'
 
 import { 
-  selectRepositoriesStatus,
+  selectRepositoriesLoadCompleted,
   selectRepositoriesPage,
   selectRepositoryById,
  } from './repositoriesSlice'
@@ -49,8 +49,8 @@ export function* loadRepositoryList(){
     try {
       yield take(fetchRepos.start)
 
-      const status = yield select(selectRepositoriesStatus)
-      if(status === 'fully_loaded'){
+      const fullyLoaded = yield select(selectRepositoriesLoadCompleted)
+      if(fullyLoaded){
         continue
       }
       yield put(fetchRepos.loading())

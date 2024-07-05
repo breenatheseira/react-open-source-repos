@@ -47,14 +47,16 @@ const ListRepositories = ({ searchText }) => {
   });
 
   let content = ''
-  if(repositoriesStatus === 'loading' || searchStatus === 'loading'){
-    content = <Loader text={'Loading...'}/>
-  } else {
-    if(repositoriesStatus === 'failed' || searchStatus === 'failed'){
+  switch(repositoriesStatus){
+    case 'loading':
+      content = <Loader text={'Loading...'}/>
+      break;
+    case 'failed':
       content = <ErrorDismissableAlert message={error} />
-    } else {
+      break;
+    default:
       content = ''
-    }
+      break;
   }
 
   return (

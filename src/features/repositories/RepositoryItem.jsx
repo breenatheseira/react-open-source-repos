@@ -9,7 +9,6 @@ import { useSelector, useDispatch } from 'react-redux'
 
 import { fetchOneRepo } from './stores/repositoryActions'
 
-
 const BadgeStat = ({ stat, icon, text }) => {
 
   return (

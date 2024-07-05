@@ -17,6 +17,7 @@ const initialState = repositoriesAdapter.getInitialState({
   currentPage: 0,
   status: 'idle',
   searchStatus: 'idle',
+  loadCompleted: false,
   error: null,
 })
 
@@ -44,7 +45,8 @@ const repositoriesSlice = createSlice({
         console.log(action)
       })
       .addCase(fetchRepos.completed, (state, action) => {
-        state.status = 'fully_loaded'
+        state.status = 'suceeded'
+        state.loadCompleted = true
         state.currentPage = action.payload.page
         repositoriesAdapter.upsertMany(state, action.payload.data)
       })
@@ -53,15 +55,15 @@ const repositoriesSlice = createSlice({
         state.error = action.payload.message
       })
       .addCase(searchRepos.start, (state, action) => {
-        state.searchStatus = 'loading'
+        state.status = 'loading'
       })
       .addCase(searchRepos.fulfilled, (state, action) => {
         const results = action.payload
         repositoriesAdapter.addMany(state, results)
-        state.searchStatus = 'succeeded'
+        state.status = 'succeeded'
       })
       .addCase(searchRepos.rejected, (state, action) => {
-        state.searchStatus = 'failed'
+        state.status = 'failed'
         state.error = action.error.message
         console.log(action.error)
       })
@@ -76,8 +78,8 @@ export const {
   selectById: selectRepositoryById,
 } = repositoriesAdapter.getSelectors(state => state.repositories)
 
-export const selectRepositoriesStatus = (state) => state.repositories.status
 export const selectRepositoriesPage = (state) => state.repositories.currentPage
+export const selectRepositoriesLoadCompleted = (state) => state.repositories.loadCompleted
 
 export const searchRepositories = createAsyncThunk('repositories/searchRepositories', async (query, { getState }) => {
   const status = getState().repositories.status

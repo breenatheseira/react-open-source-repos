@@ -2,18 +2,20 @@ import { createAction } from "@reduxjs/toolkit";
 
 // by default createAction accept a single argument, which becomes action.payload
 export const fetchRepos = {
-  start: createAction('repositories/fetch_pending'),
+  start: createAction('repositories/fetch_started'),
   fulfilled: createAction('repositories/fetch_fulfilled'),
   rejected: createAction('repositories/fetch_rejected'),
   completed: createAction('repositories/fetch_completed'),
 }
 
-// // To get subscribers count
-// export const REPOSITORY_FETCH_STARTED = createAction('REPOSITORY_FETCH_STARTED')
-// export const REPOSITORY_FETCH_SUCCEEDED = createAction('REPOSITORY_FETCH_SUCCEEDED')
-// export const REPOSITORY_FETCH_FAILED = createAction('REPOSITORY_FETCH_FAILED')
+export const fetchOneRepo = {
+  start: createAction('repositories/fetch_one_started'),
+  fulfilled: createAction('repositories/fetch_one_fulfilled'),
+  rejected: createAction('repositories/fetch_one_rejected'),
+}
 
-// export const REPOSITORIES_SEARCH_STARTED = createAction('REPOSITORIES_SEARCH_STARTED')
-// export const REPOSITORIES_SEARCH_SUCCEEDED = createAction('REPOSITORIES_SEARCH_SUCCEEDED')
-// export const REPOSITORIES_SEARCH_FAILED = createAction('REPOSITORIES_SEARCH_FAILED')
-// export const REPOSITORIES_SEARCH_RESULT_LOADED = createAction('REPOSITORIES_SEARCH_RESULT_LOADED')
+export const searchRepos = {
+  start: createAction('repositories/search_started'),
+  fulfilled: createAction('repositories/search_fulfilled'),
+  rejected: createAction('repositories/search_rejected'),
+}

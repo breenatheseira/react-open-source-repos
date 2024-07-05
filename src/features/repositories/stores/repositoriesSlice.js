@@ -2,13 +2,12 @@ import {
   createSlice,
   createEntityAdapter,
   createAsyncThunk,
-  createSelector,
 } from '@reduxjs/toolkit'
 
 import githubApi from '../../../utils/githubApi';
-import { fetchRepos } from './repositoryActions'
+import { fetchRepos, fetchOneRepo, searchRepos } from './repositoryActions'
 
-import { formatManyRepositories, formatRepository } from './repositorySerializer'
+import { formatRepositories, formatRepository } from './repositorySerializer'
 
 const repositoriesAdapter = createEntityAdapter({
   sortComparer: (a,b) => a.name.localeCompare(b.name)
@@ -45,28 +44,26 @@ const repositoriesSlice = createSlice({
       .addCase(fetchRepos.rejected, (state, action) => {
         state.status = 'failed'
         state.error = action.error.message
-        console.log(action.error)
+        console.log(action)
       })
       .addCase(fetchRepos.completed, (state, action) => {
         state.status = 'fully_loaded'
         state.currentPage = action.payload.page
         repositoriesAdapter.upsertMany(state, action.payload.data)
       })
-      .addCase(fetchRepository.fulfilled, repositoriesAdapter.setOne)
-      .addCase(fetchRepository.rejected, (state, action) => {
-        const id = action.meta.arg
-        state.entities[id].subscribers_status = 'failed'
-        console.log(action.error.message)
+      .addCase(fetchOneRepo.fulfilled, repositoriesAdapter.setOne)
+      .addCase(fetchOneRepo.rejected, (state, action) => {
+        state.error = action.payload.message
       })
-      .addCase(searchRepositories.pending, (state, action) => {
+      .addCase(searchRepos.start, (state, action) => {
         state.searchStatus = 'loading'
       })
-      .addCase(searchRepositories.fulfilled, (state, action) => {
+      .addCase(searchRepos.fulfilled, (state, action) => {
         const results = action.payload
         repositoriesAdapter.addMany(state, results)
         state.searchStatus = 'succeeded'
       })
-      .addCase(searchRepositories.rejected, (state, action) => {
+      .addCase(searchRepos.rejected, (state, action) => {
         state.searchStatus = 'failed'
         state.error = action.error.message
         console.log(action.error)
@@ -84,16 +81,6 @@ export const {
 
 export const selectRepositoriesStatus = (state) => state.repositories.status
 export const selectRepositoriesPage = (state) => state.repositories.currentPage
-
-export const fetchRepository = createAsyncThunk('repositories/fetchRepository', async (id, { getState }) => {
-  const repo = getState().repositories.entities[id]
-
-  if(repo.subscribersStatus === 'loaded'){
-    return repo
-  } 
-  const response = await githubApi.fetchOneRepo(repo.fullName)
-  return formatRepository(response.data)
-})
 
 export const searchRepositories = createAsyncThunk('repositories/searchRepositories', async (query, { getState }) => {
   const status = getState().repositories.status
@@ -116,5 +103,5 @@ export const searchRepositories = createAsyncThunk('repositories/searchRepositor
     continueCalling = totalCount > repositories.length
   }
 
-  return formatManyRepositories(repositories)
+  return formatRepositories(repositories)
 })

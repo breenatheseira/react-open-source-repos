@@ -4,12 +4,11 @@ import { useSelector, useDispatch } from 'react-redux'
 import Accordion from 'react-bootstrap/Accordion';
 import useElementOnScreen from '../../hooks/useElementOnScreen'
 
-import { fetchRepos } from './stores/repositoryActions'
+import { fetchRepos, fetchOneRepo } from './stores/repositoryActions'
 
 import {
   selectAllRepositories, 
   selectRepositoryIds,
-  fetchRepository,
 } from './stores/repositoriesSlice'
 
 import RepositoryItem from './RepositoryItem';
@@ -35,16 +34,6 @@ const ListRepositories = ({ searchText }) => {
   useEffect(() => {
     if(repositoriesStatus === 'idle' || isVisible){
       dispatch(fetchRepos.start())
-        // .unwrap()
-        // .then((response) => {
-        //   if(response.page === 1){
-        //     const id = response.data[0].id
-        //     dispatch(fetchRepository(id))
-        //   }
-        // })
-        // .catch(e => {
-        //   console.log(e)
-        // })
     }
   }, [isVisible])
 
@@ -70,7 +59,7 @@ const ListRepositories = ({ searchText }) => {
 
   function handleOnSelect(repoId){
     if(repoId !== null)
-      dispatch(fetchRepository(repoId))
+      dispatch(fetchOneRepo.start(repoId))
   }
 
   return (

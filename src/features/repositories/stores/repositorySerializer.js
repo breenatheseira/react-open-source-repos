@@ -20,6 +20,6 @@ export const formatRepository = (repository) => {
   }
 }
 
-export const formatManyRepositories = (repositories) => {
+export const formatRepositories = (repositories) => {
   return repositories.map(repo => formatRepository(repo))
 }

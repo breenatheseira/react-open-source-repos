@@ -3,6 +3,7 @@ import { createAction } from "@reduxjs/toolkit";
 // by default createAction accept a single argument, which becomes action.payload
 export const fetchRepos = {
   start: createAction('repositories/fetch_started'),
+  loading: createAction('repositories/fetch_loading'),
   fulfilled: createAction('repositories/fetch_fulfilled'),
   rejected: createAction('repositories/fetch_rejected'),
   completed: createAction('repositories/fetch_completed'),

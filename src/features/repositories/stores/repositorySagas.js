@@ -48,6 +48,12 @@ export function* loadRepositoryList(){
   while(true){
     try {
       yield take(fetchRepos.start)
+
+      const status = yield select(selectRepositoriesStatus)
+      if(status === 'fully_loaded'){
+        continue
+      }
+      yield put(fetchRepos.loading())
       let page = yield call (getNextPage, selectRepositoriesPage)
 
       const response = yield call(githubApi.fetchRepos, page)

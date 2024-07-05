@@ -30,10 +30,7 @@ const repositoriesSlice = createSlice({
   },
   extraReducers(builder){
     builder
-      .addCase(fetchRepos.start, (state, action) => {
-        if(state.status === 'fully_loaded'){
-          return state
-        }
+      .addCase(fetchRepos.loading, (state, action) => {
         state.status = 'loading'
       })
       .addCase(fetchRepos.fulfilled, (state, action) => {

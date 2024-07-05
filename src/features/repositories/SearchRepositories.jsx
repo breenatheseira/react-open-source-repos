@@ -1,7 +1,7 @@
-import { useEffect } from "react"
 import { useDispatch } from "react-redux"
 import SearchBar from "../../components/SearchBar"
-import { searchRepositories } from "./repositoriesSlice"
+
+import { searchRepos } from './stores/repositoryActions'
 
 const SearchRepositories = ({ text, setText }) => {
   const dispatch = useDispatch()
@@ -10,7 +10,7 @@ const SearchRepositories = ({ text, setText }) => {
     if(trimmedText === '' || trimmedText === null){
       return
     }
-    dispatch(searchRepositories(trimmedText))
+    dispatch(searchRepos.start(trimmedText))
   }
 
   return (

@@ -1,5 +1,4 @@
-import { createAction, createAsyncThunk } from "@reduxjs/toolkit";
-import { call, put, fork, select, take, cancel } from 'redux-saga/effects'
+import { call, put, fork, select, take, takeEvery, cancel } from 'redux-saga/effects'
 
 import githubApi from '../../../utils/githubApi';
 import { fetchOneRepo, fetchRepos, searchRepos } from './repositoryActions'
@@ -22,7 +21,7 @@ export function* loadOneRepository(){
       const repository = yield select(selectRepositoryById, payload)
 
       if(repository.subscribersStatus === 'loaded'){
-        yield cancel()
+        continue
       }
 
       const response = yield call(githubApi.fetchOneRepo, repository.fullName)
@@ -62,7 +61,7 @@ export function* loadRepositoryList(){
       } else {
         yield put(fetchRepos.fulfilled(payload))
       }
-      
+
       if(page === 1){
         yield put(fetchOneRepo.start(data[0].id))
       }

@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import Accordion from 'react-bootstrap/Accordion';
 import useElementOnScreen from '../../hooks/useElementOnScreen'
 
-import { fetchRepos, fetchOneRepo } from './stores/repositoryActions'
+import { fetchRepos } from './stores/repositoryActions'
 
 import {
   selectAllRepositories, 
@@ -41,7 +41,7 @@ const ListRepositories = ({ searchText }) => {
 
   repos.forEach(repo => {
     if(repo.name.includes(searchText)){
-      results.push(<RepositoryItem repo={repo} key={repo.id} />);
+      results.push(<RepositoryItem id={repo.id} key={repo.id} />);
     }
     return;
   });
@@ -57,11 +57,6 @@ const ListRepositories = ({ searchText }) => {
     }
   }
 
-  function handleOnSelect(repoId){
-    if(repoId !== null)
-      dispatch(fetchOneRepo.start(repoId))
-  }
-
   return (
     <>
       loaded: {repos.length}
@@ -72,7 +67,6 @@ const ListRepositories = ({ searchText }) => {
       {(repoIds.length > 0) ? (
         <Accordion 
           defaultActiveKey={repoIds && repoIds[0]}
-          onSelect={(e) => {handleOnSelect(e)}}
         >
           {results}
           {content}

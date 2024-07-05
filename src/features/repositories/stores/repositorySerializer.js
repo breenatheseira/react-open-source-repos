@@ -1,4 +1,4 @@
-export const repositorySerializer = (repository) => {
+export const formatRepository = (repository) => {
   if(repository.error){
     return repository
   }
@@ -18,4 +18,8 @@ export const repositorySerializer = (repository) => {
     forked: repository.forks_count,
     subscribersStatus: subStatus
   }
+}
+
+export const formatRepositories = (repositories) => {
+  return repositories.map(repo => formatRepository(repo))
 }

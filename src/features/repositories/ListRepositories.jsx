@@ -1,16 +1,15 @@
-import useElementOnScreen from '../../hooks/useElementOnScreen'
-
-import Accordion from 'react-bootstrap/Accordion';
-
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 
-import { 
-  fetchRepositories, 
-  fetchRepository,
+import Accordion from 'react-bootstrap/Accordion';
+import useElementOnScreen from '../../hooks/useElementOnScreen'
+
+import { fetchRepos } from './stores/repositoryActions'
+
+import {
   selectAllRepositories, 
   selectRepositoryIds,
-} from './repositoriesSlice'
+} from './stores/repositoriesSlice'
 
 import RepositoryItem from './RepositoryItem';
 import Loader from '../../components/Loader'
@@ -20,7 +19,7 @@ const ListRepositories = ({ searchText }) => {
   const dispatch = useDispatch()
 
   const repositoriesStatus = useSelector(state => state.repositories.status)
-  const searchStatus = useSelector(state => state.repositories.searchStatus)
+  const repositoriesFullyLoaded = useSelector(state => state.repositories.loadCompleted)
   const repos = useSelector(selectAllRepositories)
   const repoIds = useSelector(selectRepositoryIds)
   const error = useSelector(state => state.repositories.error)
@@ -33,21 +32,8 @@ const ListRepositories = ({ searchText }) => {
 
   // fetch for the first time, or when end of page is reached
   useEffect(() => {
-    if(repositoriesStatus === 'fully_loaded'){
-      return
-    }
     if(repositoriesStatus === 'idle' || isVisible){
-      dispatch(fetchRepositories())
-        .unwrap()
-        .then((response) => {
-          if(response.page === 1){
-            const id = response.data[0].id
-            dispatch(fetchRepository(id))
-          }
-        })
-        .catch(e => {
-          console.log(e)
-        })
+      dispatch(fetchRepos.start())
     }
   }, [isVisible])
 
@@ -55,43 +41,50 @@ const ListRepositories = ({ searchText }) => {
 
   repos.forEach(repo => {
     if(repo.name.includes(searchText)){
-      results.push(<RepositoryItem repo={repo} key={repo.id} />);
+      results.push(<RepositoryItem id={repo.id} key={repo.id} />);
     }
     return;
   });
 
   let content = ''
-  if(repositoriesStatus === 'loading' || searchStatus === 'loading'){
-    content = <Loader text={'Loading...'}/>
-  } else {
-    if(repositoriesStatus === 'failed' || searchStatus === 'failed'){
+  switch(repositoriesStatus){
+    case 'loading':
+      if(!repositoriesFullyLoaded){
+        content = <Loader text={'Loading...'}/>
+      } else {
+        content = ''
+      }      
+      break;
+    case 'failed':
       content = <ErrorDismissableAlert message={error} />
-    } else {
+      break;
+    default:
       content = ''
-    }
-  }
-
-  function handleOnSelect(repoId){
-    if(repoId !== null)
-      dispatch(fetchRepository(repoId))
+      break;
   }
 
   return (
     <>
       <hr className='py-2' />
-      {(repoIds.length === 0) ? (content) : (<></>)}
-      {(repoIds.length > 0) ? (
-        <Accordion 
-          defaultActiveKey={repoIds && repoIds[0]}
-          onSelect={(e) => {handleOnSelect(e)}}
-        >
-          {results}
-          {content}
-          <div ref={containerRef}></div>
-        </Accordion>
-      ) : (
-        <></>
-      )}
+      { (searchText?.length > 0 && results.length === 0) ? (
+          <div className='text-center'>
+            <span>There are no repositories matching the search term.</span>{' '}
+            <span>Please try again.</span>
+          </div>
+        ) : (
+          (repoIds.length > 0) ? (
+            <Accordion 
+              defaultActiveKey={repoIds && repoIds[0]}
+            >
+              {(results)}
+              {content}
+              <div ref={containerRef}></div>
+            </Accordion>
+          ) : (
+            <></>
+          )
+        )
+      }
     </>
   )
 }

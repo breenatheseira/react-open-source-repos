@@ -4,6 +4,10 @@ import Badge from 'react-bootstrap/Badge';
 import eyeIcon from '../../assets/images/eye.svg'
 import starIcon from '../../assets/images/star.svg'
 import forkIcon from '../../assets/images/fork.svg'
+import { selectRepositoryById } from './stores/repositoriesSlice';
+import { useSelector, useDispatch } from 'react-redux'
+
+import { fetchOneRepo } from './stores/repositoryActions'
 
 const BadgeStat = ({ stat, icon, text }) => {
 
@@ -22,7 +26,10 @@ const BadgeStat = ({ stat, icon, text }) => {
   )
 }
 
-const RepositoryItem = ({ repo }) => {
+const RepositoryItem = ({ id }) => {
+
+  const dispatch = useDispatch()
+  const repo = useSelector(state => selectRepositoryById(state, id))
 
   let shortDesc = repo?.description?.split(" ")
   if(shortDesc && shortDesc.length > 3){
@@ -32,8 +39,8 @@ const RepositoryItem = ({ repo }) => {
   }
 
   return (
-    <Accordion.Item eventKey={repo.id}>
-      <Accordion.Header>
+    <Accordion.Item eventKey={id}>
+      <Accordion.Header onClick={() => {dispatch(fetchOneRepo.start(id))} }>
         <span><b>{repo.name}</b></span>
         <span className='d-none d-md-block text-truncate text-break' style={{maxWidth: '25em'}}>
           <small className='text-center fs-7 fw-light'>:{' '}{shortDesc}</small>
